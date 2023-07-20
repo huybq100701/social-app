@@ -22,7 +22,7 @@ const FollowersRandomPost = () => {
       setPosts(data);
     } catch (error) {
       console.log(error);
-    }
+    }2
   };
 
   const handleRefresh = () => {
