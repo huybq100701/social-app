@@ -9,11 +9,8 @@ const bcrypt = require("bcrypt");
 const { request } = require('express');
 
 
-// router.get('/home', (req, res) => {
-//     res.send("Hello World");
-// })
 
-async function mailer(receiveremail, code) {
+async function mailer(recieveremail, code) {
     // console.log("Mailer function called");
 
     let transporter = nodemailer.createTransport({
@@ -30,8 +27,8 @@ async function mailer(receiveremail, code) {
 
 
     let info = await transporter.sendMail({
-        from: "SocialChatApp",
-        to: `${receiveremail}`,
+        from: "SocialAppChat",
+        to: `${recieveremail}`,
         subject: "Email Verification",
         text: `Your Verification Code is ${code}`,
         html: `<b>Your Verification Code is ${code}</b>`,
@@ -594,6 +591,3 @@ router.post('/unfollowuser', (req, res) => {
 })
 module.exports = router;
 
-
-// $2b$08$1Hkn50MGDJSrwBt024DySerDtuFrDzFIDY8bkev83PS7RWC3m67lC
-// $2b$08$znPHy0v.QmmESyqTruTXuu2DER6Y5wmXk6Y/W9sIZw4bRqgsZpGyS

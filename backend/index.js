@@ -5,13 +5,14 @@ const bodyParser = require('body-parser');
 require('./db');
 require('./models/User');
 require('./models/Message');
+require('./models/Post')
 const authRoutes = require('./routes/authRoutes');
 const uploadMediaRoutes = require('./routes/uploadMediaRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const postRoutes = require('./routes/postRoutes')
 //requireToken skipped
 
 
-//.......18
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 
@@ -28,14 +29,13 @@ app.use(bodyParser.json());
 app.use(authRoutes);
 app.use(uploadMediaRoutes);
 app.use(messageRoutes);
-
+app.use(postRoutes);
 app.get('/', (req, res) => {
     res.send("Hello World");
 })
 
 
-//...........18
-
+//
 io.on("connection", (socket) => {
 
     console.log("USER CONNECTED - ", socket.id);
@@ -64,6 +64,3 @@ app.listen(port, () => {
 })
 
 
-
-// 6353f0c6a52cde6dafae64d2634c1d60f09a4f3ff40be517
-// 6353f0c6a52cde6dafae64d2634c1d60f09a4f3ff40be517

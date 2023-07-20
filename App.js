@@ -31,8 +31,11 @@ import UploadProfilePicture from './SRC/Screens/Settings/UploadProfilePicture';
 import AddPost from './SRC/Screens/Mainpage/AddPost';
 import Other_UserProfile from './SRC/Screens/Profile/Other_UserProfile';
 import MessagePage from './SRC/Screens/ChatSection/MessagePage';
-const Stack = createNativeStackNavigator();
+import { LogBox } from 'react-native';
 
+const Stack = createNativeStackNavigator();
+LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs();//Ignore all log notifications
 export default function App() {
   return (
     <NavigationContainer>

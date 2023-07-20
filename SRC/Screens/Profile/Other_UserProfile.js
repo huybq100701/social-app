@@ -242,7 +242,7 @@ const Other_UserProfile = ({ navigation, route }) => {
                                                         userdata.posts?.map(
                                                             (item) => {
                                                                 return (
-                                                                    <Image key={item.post} style={styles.postpic}
+                                                                    <Image key={item.post} style={styles.post_pic}
                                                                         source={{ uri: item.post }}
                                                                     />
                                                                 )
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingVertical: 20,
     },
-    postpic: {
+    post_pic: {
         width: '30%',
         height: 120,
         margin: 5
@@ -379,5 +379,4 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     }
 })
-
 

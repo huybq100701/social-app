@@ -72,7 +72,7 @@ const AddPost = ({ navigation }) => {
                             if (data.message == 'Post added successfully') {
                                 alert('Post added successfully')
                                 setLoading2(false)
-                                navigation.navigate('My_UserProfile')
+                                navigation.navigate('MainPage')
                             }
                             else {
                                 alert('Something went wrong, please try again')

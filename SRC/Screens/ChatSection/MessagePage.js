@@ -19,7 +19,7 @@ const MessagePage = ({ navigation, route }) => {
     const [ouruserdata, setOuruserdata] = React.useState(null);
     const [fuserdata, setFuserdata] = React.useState(null);
 
-    const [userid, setUserid] = React.useState(null);
+    const [userid, setuserid] = React.useState(null);
     const [roomid, setRoomid] = React.useState(null);
     const [chat, setChat] = React.useState(['']);
 
@@ -61,7 +61,7 @@ const MessagePage = ({ navigation, route }) => {
                         if (data.message == 'User Found') {
                             // console.log('our user data ', data.user.username)
                             setOuruserdata(data.user)
-                            setUserid(data.user._id)
+                            setuserid(data.user._id)
 
                             fetch('http://10.0.2.2:3000/otheruserdata', {
                                 method: 'POST',
