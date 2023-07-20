@@ -55,84 +55,81 @@ router.get('/getposts', async (req, res) => {
   }
 });
 
-router.post('/addcomment', async (req, res) => {
-  const { email, postId, userId, comment } = req.body;
-  try {
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(422).json({ error: 'Invalid Credentials' });
-    }
+// Like a post
+router.post('/likepost', (req, res) => {
+  const { email, postdescription } = req.body;
+  console.log(email, postdescription);
 
-    const post = user.posts.id(postId);
-    if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    post.comments.push({ userId, comment });
-    await user.save();
-
-    res.json({ message: 'Comment added successfully' });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+  if (!email || !postdescription) {
+    return res.status(422).json({ error: 'Invalid Credentials' });
   }
+
+  User.findOne({ email }) 
+    .then(async (user) => {
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const post = user.posts.find((post) => post.postdescription === postdescription);
+      // console.log("Day la post:",post)
+      // console.log("Day la email:",email)
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+
+      if (post.likes.includes(email)) {
+        return res.status(400).json({ error: 'User already liked the post' });
+      }
+
+      post.likes.push(email);
+      const newUser = await User.findByIdAndUpdate({_id:user._id},user)
+      res.status(200).json({ message: 'Post liked successfully' });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    });
 });
 
-router.post('/likepost', async (req, res) => {
-  const { email, postId, userId } = req.body;
-  try {
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(422).json({ error: 'Invalid Credentials' });
-    }
+// Unlike a post
+router.post('/unlikepost', (req, res) => {
+  const { email, postdescription } = req.body;
+  console.log(email, postdescription);
 
-    const post = user.posts.id(postId);
-    if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    const likedIndex = post.likes.indexOf(userId);
-    if (likedIndex === -1) {
-      post.likes.push(userId);
-    } else {
-      post.likes.splice(likedIndex, 1);
-    }
-
-    await user.save();
-
-    res.json({ message: 'Post liked successfully' });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+  if (!email || !postdescription) {
+    return res.status(422).json({ error: 'Invalid Credentials' });
   }
+
+  User.findOne({ email })
+    .then(async (user) => {
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const post = user.posts.find((post) => post.postdescription === postdescription);
+
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+
+      const likedIndex = post.likes.indexOf(email);
+
+      if (likedIndex !== -1) {
+        // User has already liked the post, so we'll remove the like
+        post.likes.splice(likedIndex, 1);
+      } else {
+        // User has not liked the post, so we'll add the like
+        post.likes.push(email);
+      }
+
+      const newUser = await User.findByIdAndUpdate(user._id, user);
+      res.status(200).json({ message: 'Post unlike status updated successfully' });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    });
 });
-
-// router.post('/likepost', async (req, res) => {
-//   try {
-//     const { userId, postId } = req.body;
-
-//     const user = await User.findById(userId);
-//     console.log(user)
-//     const {posts} = user;
-//     const {likes} = posts;
-//     console.log(likes)
-//     // const newPosts = []
-//     // if (posts.includes(postId)){
-//     //   newPosts = posts.filter((id) => id != postId)
-//     // } else {
-//     //   newPosts = posts.push(postId)
-//     // }
-//     // const newUser = {
-//     //   ...user,
-//     //   posts: newPosts
-//     // }
-//     // await User.save(newUser)
-//     return res.json(likes);
-
-//   } catch (error) {
-    
-//   }
-// })
 
 
 
