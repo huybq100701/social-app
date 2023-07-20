@@ -31,26 +31,77 @@ const Post_Big_Card = ({
   useEffect(() => {
     setCommentList(comments);
     setLikeCount(likes.length);
-  }, [comments, likes]);
+    setIsLiked(likes.includes(username));
+  }, [comments, likes, username]);
 
-  const handleLike = () => {
-    setIsLiked((prevIsLiked) => !prevIsLiked);
-    onLikePost(username, postId);
-  };
+  const handleLike = async () => {
+    const action = isLiked ? "unlike" : "like";
+    setIsLiked(!isLiked);
 
-  const handleCommentSubmit = () => {
-    if (commentText.trim() !== "") {
-      const newComment = {
-        id: Date.now().toString(),
-        username: username,
-        comment: commentText.trim(),
-      };
-      setCommentList((prevComments) => [...prevComments, newComment]);
-      setCommentText("");
-      onAddComment(username, postId, commentText);
+    try {
+      const response = await fetch("/likepost", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: postId,
+          email: username,
+          postdescription: post_description,
+          action: action,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        if (action === "like") {
+          setLikeCount((prevCount) => prevCount + 1);
+        } else {
+          setLikeCount((prevCount) => prevCount - 1);
+        }
+      } else {
+        console.log(data.error);
+        setIsLiked(!isLiked);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLiked(!isLiked);
     }
   };
 
+  const handleCommentSubmit = async () => {
+    if (commentText.trim() !== "") {
+      try {
+        const response = await fetch("/commentpost", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            _id: postId,
+            email: username,
+            postdescription: post_description,
+            comment: commentText.trim(),
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          const newComment = {
+            id: Date.now().toString(),
+            username: username,
+            comment: commentText.trim(),
+          };
+          setCommentList((prevComments) => [...prevComments, newComment]);
+          setCommentText("");
+        } else {
+          console.log(data.error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.c1}>
@@ -67,7 +118,7 @@ const Post_Big_Card = ({
             <AntDesign
               name="heart"
               size={24}
-              color="black"
+              color="red"
               style={styles.iconliked}
               onPress={handleLike}
             />
@@ -121,6 +172,7 @@ const Post_Big_Card = ({
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

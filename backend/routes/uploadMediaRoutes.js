@@ -56,79 +56,82 @@ router.get('/getposts', async (req, res) => {
 });
 
 // Like a post
-router.post('/likepost', (req, res) => {
-  const { email, postdescription } = req.body;
+router.post('/likepost', async (req, res) => {
+  const { _id, email, postdescription, action } = req.body;
   console.log(email, postdescription);
 
-  if (!email || !postdescription) {
+  if (!_id || !email || !postdescription || !action) {
     return res.status(422).json({ error: 'Invalid Credentials' });
   }
+  try {
+    const user = await User.findById(_id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-  User.findOne({ email }) 
-    .then(async (user) => {
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      const post = user.posts.find((post) => post.postdescription === postdescription);
-      // console.log("Day la post:",post)
-      // console.log("Day la email:",email)
+    let post;
+    if (action === 'allposts') {
+      post = user.posts;
+    } else {
+      post = user.posts.find((post) => post.postdescription === postdescription);
       if (!post) {
         return res.status(404).json({ error: 'Post not found' });
       }
-
-      if (post.likes.includes(email)) {
-        return res.status(400).json({ error: 'User already liked the post' });
+      const likedIndex = post.likes.indexOf(email);
+      if (action === 'like') {
+        if (likedIndex === -1) {
+          post.likes.push(email);
+        }
+      } else if (action === 'unlike') {
+        if (likedIndex !== -1) {
+          post.likes.splice(likedIndex, 1);
+        }
+      } else {
+        return res.status(400).json({ error: 'Invalid action' });
       }
+    }
 
-      post.likes.push(email);
-      const newUser = await User.findByIdAndUpdate({_id:user._id},user)
-      res.status(200).json({ message: 'Post liked successfully' });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    });
+    await user.save();
+    res.status(200).json({ message: `Action '${action}' successful`, post });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// Unlike a post
-router.post('/unlikepost', (req, res) => {
-  const { email, postdescription } = req.body;
-  console.log(email, postdescription);
+//comment
+router.post('/commentpost', async (req, res) => {
+  const { _id, email, postdescription, comment, action } = req.body;
+  console.log(email, postdescription, comment);
 
-  if (!email || !postdescription) {
+  if (!_id || !email || !postdescription || (!comment && action !== 'allposts')) {
     return res.status(422).json({ error: 'Invalid Credentials' });
   }
+  
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-  User.findOne({ email })
-    .then(async (user) => {
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
+    if (action === 'allposts') {
+      user.posts.forEach((post) => {
+        post.comments.push({ email, comment });
+      });
+    } else {
       const post = user.posts.find((post) => post.postdescription === postdescription);
-
       if (!post) {
         return res.status(404).json({ error: 'Post not found' });
       }
+      post.comments.push({ email, comment });
+    }
 
-      const likedIndex = post.likes.indexOf(email);
-
-      if (likedIndex !== -1) {
-        // User has already liked the post, so we'll remove the like
-        post.likes.splice(likedIndex, 1);
-      } else {
-        // User has not liked the post, so we'll add the like
-        post.likes.push(email);
-      }
-
-      const newUser = await User.findByIdAndUpdate(user._id, user);
-      res.status(200).json({ message: 'Post unlike status updated successfully' });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    });
+    await user.save();
+    res.status(200).json({ message: 'Comment added successfully', post });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 
