@@ -8,7 +8,7 @@ const FollowersRandomPost = () => {
 
   useEffect(() => {
     fetchPosts();
-    const refreshInterval = setInterval(fetchPosts, 2000); // Fetch new posts every 5 seconds
+    const refreshInterval = setInterval(fetchPosts, 22000); // Fetch new posts every 5 seconds
 
     return () => {
       clearInterval(refreshInterval); // Cleanup the interval on unmount

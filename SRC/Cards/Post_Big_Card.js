@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { icons1 } from "../CommonCss/pagecss";
+import postStyles from "../CommonCss/postcss";
 
 const Post_Big_Card = ({
   post_pic,
@@ -18,10 +18,9 @@ const Post_Big_Card = ({
   likes,
   comments,
   post_description,
-  postId,
-  onLikePost,
-  onAddComment,
+  userId, 
 }) => {
+  const styles = postStyles;
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentList, setCommentList] = useState(comments);
@@ -31,22 +30,22 @@ const Post_Big_Card = ({
   useEffect(() => {
     setCommentList(comments);
     setLikeCount(likes.length);
-    setIsLiked(likes.includes(username));
-  }, [comments, likes, username]);
+    setIsLiked(likes.includes(userId));
+  }, [comments, likes, userId]);
 
   const handleLike = async () => {
     const action = isLiked ? "unlike" : "like";
     setIsLiked(!isLiked);
 
     try {
-      const response = await fetch("/likepost", {
+      const response = await fetch("http://10.0.2.2:3000/likepost", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          _id: postId,
-          email: username,
+          userId: userId, 
+          username: username,
           postdescription: post_description,
           action: action,
         }),
@@ -72,14 +71,14 @@ const Post_Big_Card = ({
   const handleCommentSubmit = async () => {
     if (commentText.trim() !== "") {
       try {
-        const response = await fetch("/commentpost", {
+        const response = await fetch("http://10.0.2.2:3000/commentpost", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            _id: postId,
-            email: username,
+            userId: userId, 
+            username: username,
             postdescription: post_description,
             comment: commentText.trim(),
           }),
@@ -102,15 +101,18 @@ const Post_Big_Card = ({
       }
     }
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.c1}>
         <Image source={{ uri: profile_image }} style={styles.profilepic} />
         <Text style={styles.username}>{username}</Text>
       </View>
-      <View style={styles.descriptionContainer}>
-        <Text style={styles.description}>{post_description}</Text>
-      </View>
+      {post_description && (
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.description}>{post_description}</Text>
+        </View>
+      )}
       <Image source={{ uri: post_pic }} style={styles.image} />
       <View style={styles.s2}>
         <View style={styles.s21}>
@@ -126,25 +128,23 @@ const Post_Big_Card = ({
             <AntDesign
               name="hearto"
               size={24}
-              color="black"
-              style={icons1}
+              color="white"
+              style={styles.icon}
               onPress={handleLike}
             />
           )}
           <Text style={styles.likeCount}>{likeCount}</Text>
         </View>
-
         <View style={styles.s22}>
           <FontAwesome
             name="comment"
             size={24}
-            color="black"
-            style={icons1}
+            color="white"
+            style={styles.icon}
             onPress={() => setShowComments(!showComments)}
           />
         </View>
       </View>
-
       {showComments && (
         <View style={styles.s3}>
           {commentList.map((item) => (
@@ -172,116 +172,5 @@ const Post_Big_Card = ({
     </View>
   );
 };
-
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    width: "100%",
-    borderRadius: 10,
-    marginVertical: 10,
-    overflow: "hidden",
-    borderColor: "white",
-    borderWidth: 1,
-  },
-  c1: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "black",
-  },
-  profilepic: {
-    width: 30,
-    height: 30,
-    borderRadius: 30,
-    borderColor: "white",
-    borderWidth: 1,
-  },
-  username: {
-    color: "white",
-    marginLeft: 10,
-    fontSize: 17,
-    fontWeight: "bold",
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 1,
-  },
-  s2: {
-    width: "100%",
-    flexDirection: "row",
-    backgroundColor: "black",
-    padding: 10,
-    alignItems: "center",
-  },
-  s21: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconliked: {
-    color: "#DC143C",
-    fontSize: 30,
-  },
-  likeCount: {
-    color: "black",
-    marginLeft: 5,
-    fontSize: 16,
-  },
-  s22: {
-    marginLeft: 20,
-  },
-  s3: {
-    width: "100%",
-    backgroundColor: "#111111",
-    padding: 10,
-  },
-  commentContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 3,
-  },
-  commentUser: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 17,
-  },
-  commentText: {
-    color: "grey",
-    fontSize: 17,
-    marginLeft: 5,
-  },
-  descriptionContainer: {
-    backgroundColor: "black",
-    padding: 10,
-  },
-  description: {
-    color: "white",
-    fontSize: 17,
-  },
-  commentInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  commentInput: {
-    flex: 1,
-    backgroundColor: "white",
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  commentButton: {
-    backgroundColor: "blue",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  commentButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-});
 
 export default Post_Big_Card;

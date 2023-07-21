@@ -57,10 +57,10 @@ router.get('/getposts', async (req, res) => {
 
 // Like a post
 router.post('/likepost', async (req, res) => {
-  const { _id, email, postdescription, action } = req.body;
-  // console.log(email, postdescription);
+  const { _id, username, postdescription, action } = req.body;
+  // console.log(username, postdescription);
 
-  if (!_id || !email || !postdescription || !action) {
+  if (!_id || !username || !postdescription || !action) {
     return res.status(422).json({ error: 'Invalid Credentials' });
   }
   try {
@@ -77,10 +77,10 @@ router.post('/likepost', async (req, res) => {
       if (!post) {
         return res.status(404).json({ error: 'Post not found' });
       }
-      const likedIndex = post.likes.indexOf(email);
+      const likedIndex = post.likes.indexOf(username);
       if (action === 'like') {
         if (likedIndex === -1) {
-          post.likes.push(email);
+          post.likes.push(username);
         }
       } else if (action === 'unlike') {
         if (likedIndex !== -1) {
@@ -103,9 +103,9 @@ router.post('/likepost', async (req, res) => {
 
 //comment
 router.post('/commentpost', async (req, res) => {
-  const { _id, email, postdescription, comment, action } = req.body;
+  const { _id, username, postdescription, comment, action } = req.body;
 
-  if (!_id || !email || !postdescription || (!comment && action !== 'allposts')) {
+  if (!_id || !username || !postdescription || (!comment && action !== 'allposts')) {
     return res.status(422).json({ error: 'Invalid Credentials' });
   }
 
@@ -123,7 +123,7 @@ router.post('/commentpost', async (req, res) => {
       if (!post) {
         return res.status(404).json({ error: 'Post not found' });
       }
-      post.comments.push({ email, comment });
+      post.comments.push({ username, comment });
       user.posts[user.posts.indexOf(post)] = post;
     }
 
