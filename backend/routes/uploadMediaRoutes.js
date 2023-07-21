@@ -58,7 +58,7 @@ router.get('/getposts', async (req, res) => {
 // Like a post
 router.post('/likepost', async (req, res) => {
   const { _id, email, postdescription, action } = req.body;
-  console.log(email, postdescription);
+  // console.log(email, postdescription);
 
   if (!_id || !email || !postdescription || !action) {
     return res.status(422).json({ error: 'Invalid Credentials' });
@@ -90,7 +90,8 @@ router.post('/likepost', async (req, res) => {
         return res.status(400).json({ error: 'Invalid action' });
       }
     }
-
+    console.log(user.posts.indexOf(post))
+    user.posts[user.posts.indexOf(post)] = post
     await user.save();
     res.status(200).json({ message: `Action '${action}' successful`, post });
   } catch (err) {
@@ -99,31 +100,31 @@ router.post('/likepost', async (req, res) => {
   }
 });
 
+
 //comment
 router.post('/commentpost', async (req, res) => {
   const { _id, email, postdescription, comment, action } = req.body;
-  console.log(email, postdescription, comment);
 
   if (!_id || !email || !postdescription || (!comment && action !== 'allposts')) {
     return res.status(422).json({ error: 'Invalid Credentials' });
   }
-  
+
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findById(_id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    let post;
     if (action === 'allposts') {
-      user.posts.forEach((post) => {
-        post.comments.push({ email, comment });
-      });
+      post = user.posts;
     } else {
-      const post = user.posts.find((post) => post.postdescription === postdescription);
+      post = user.posts.find((post) => post.postdescription === postdescription);
       if (!post) {
         return res.status(404).json({ error: 'Post not found' });
       }
       post.comments.push({ email, comment });
+      user.posts[user.posts.indexOf(post)] = post;
     }
 
     await user.save();
@@ -133,7 +134,6 @@ router.post('/commentpost', async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 
 module.exports = router;
