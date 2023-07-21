@@ -20,9 +20,10 @@ const FollowersRandomPost = () => {
       const response = await fetch('http://10.0.2.2:3000/getposts');
       const data = await response.json();
       setPosts(data);
+      
     } catch (error) {
       console.log(error);
-    }2
+    }
   };
 
   const handleRefresh = () => {
@@ -34,13 +35,13 @@ const FollowersRandomPost = () => {
       {posts.map((item) => (
         <Post_Big_Card
           key={item._id + refreshKey}
-          postId={item._id}
+          userId={item._id}
           username={item.username}
           profile_image={item.profile_image}
           post_pic={item.post_pic}
           likes={item.likes}
           comments={item.comments}
-          post_description={item.postdescription}
+          post_description={item.post_description}
         />
       ))}
     </ScrollView>

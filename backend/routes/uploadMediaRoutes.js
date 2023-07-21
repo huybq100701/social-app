@@ -40,6 +40,7 @@ router.get('/getposts', async (req, res) => {
     const users = await User.find().select('username profilepic posts');
     const posts = users.flatMap((user) =>
       user.posts.map((post) => ({
+        _id: user._id,
         username: user.username,
         profile_image: user.profilepic,
         post_pic: post.post,
@@ -47,7 +48,9 @@ router.get('/getposts', async (req, res) => {
         likes: post.likes,
         comments: post.comments
       }))
+     
     );
+
     res.json(posts);
   } catch (error) {
     console.log(error);
@@ -58,10 +61,10 @@ router.get('/getposts', async (req, res) => {
 // Like a post
 router.post('/likepost', async (req, res) => {
   const { _id, username, postdescription, action } = req.body;
-  // console.log(username, postdescription);
-
   if (!_id || !username || !postdescription || !action) {
+    
     return res.status(422).json({ error: 'Invalid Credentials' });
+    
   }
   try {
     const user = await User.findById(_id);
@@ -90,8 +93,9 @@ router.post('/likepost', async (req, res) => {
         return res.status(400).json({ error: 'Invalid action' });
       }
     }
-    console.log(user.posts.indexOf(post))
+    // console.log(user.posts.indexOf(post))
     user.posts[user.posts.indexOf(post)] = post
+    // console.log(user)
     await user.save();
     res.status(200).json({ message: `Action '${action}' successful`, post });
   } catch (err) {

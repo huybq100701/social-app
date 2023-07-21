@@ -26,7 +26,7 @@ const Post_Big_Card = ({
   const [commentList, setCommentList] = useState(comments);
   const [likeCount, setLikeCount] = useState(likes.length);
   const [commentText, setCommentText] = useState("");
-
+  
   useEffect(() => {
     setCommentList(comments);
     setLikeCount(likes.length);
@@ -44,7 +44,7 @@ const Post_Big_Card = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: userId, 
+          _id: userId, 
           username: username,
           postdescription: post_description,
           action: action,
@@ -77,7 +77,7 @@ const Post_Big_Card = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: userId, 
+            _id: userId, 
             username: username,
             postdescription: post_description,
             comment: commentText.trim(),
