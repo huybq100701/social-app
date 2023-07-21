@@ -30,7 +30,7 @@ const Post_Big_Card = ({
   useEffect(() => {
     setCommentList(comments);
     setLikeCount(likes.length);
-    setIsLiked(likes.includes(userId));
+    setIsLiked(likes.includes(username));
   }, [comments, likes, userId]);
 
   const handleLike = async () => {
